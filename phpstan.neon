@@ -1,0 +1,31 @@
+# Vereist (dev):
+#   composer require --dev phpstan/phpstan phpstan/phpstan-symfony phpstan/phpstan-doctrine
+#
+# Bewuste keuze: GEEN phpstan/extension-installer. Die package is een Composer-plugin
+# (draait code tijdens `composer install`) die de includes hieronder automatisch regelt.
+# Wij includen ze met de hand: geen extra plugin in allow-plugins, en in dit bestand
+# staat expliciet welke extensies actief zijn.
+#
+# extension.neon = type-inferentie (PHPStan begrijpt Symfony/Doctrine-API's).
+# rules.neon     = extra regels die framework-specifieke fouten afkeuren.
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
+parameters:
+    level: 6            # Middenniveau voor oefenen. Naar 9/max als parkfinder portfolio wordt.
+    tmpDir: .cache/phpstan
+
+    paths:
+        - src
+        - tests
+
+    excludePaths:
+        - tests/bootstrap.php
+
+    # Laat de Symfony-extensie de DI-container begrijpen (autowiring, services).
+    # Pad geverifieerd na `bin/console cache:warmup`.
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
