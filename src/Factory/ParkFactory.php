@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
+use App\Action\GenerateSlug;
 use App\Entity\Park;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 final readonly class ParkFactory
 {
     public function __construct(
-        private SluggerInterface $slugger,
+        private GenerateSlug $generateSlug,
     ) {
     }
 
@@ -18,7 +18,7 @@ final readonly class ParkFactory
     {
         $park = new Park(
             name: $name,
-            slug: $this->slugger->slug($name)->lower()->toString(),
+            slug: $this->generateSlug->make($name),
         );
 
         return $park->setHasPool($hasPool);
