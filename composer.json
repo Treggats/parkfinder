@@ -97,6 +97,7 @@
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.6",
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "*",
         "phpstan/phpstan-doctrine": "*",
