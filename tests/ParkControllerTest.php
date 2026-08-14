@@ -24,6 +24,21 @@ final class ParkControllerTest extends WebTestCase
     private ParkFactory $factory;
     private ParkRepository $repository;
 
+    /** @return Park[] */
+    public function createPark(string $name, int $amount = 1): array
+    {
+        $parks = [];
+        for ($i = 1; $i <= $amount; $i++) {
+            $park = $this->factory->create($name);
+            $this->entityManager->persist($park);
+            $parks[] = $park;
+        }
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        return $parks;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -38,10 +53,7 @@ final class ParkControllerTest extends WebTestCase
     #[Test]
     public function canFetchASingleParkBySlug(): void
     {
-        $park = $this->factory->create('Witterzomer');
-        $this->entityManager->persist($park);
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        $this->createPark('Witterzomer');
 
         $this->client->request('GET', '/parks/witterzomer');
 
@@ -177,5 +189,22 @@ final class ParkControllerTest extends WebTestCase
         $this->client->request('POST', '/parks', server: $server, content: '{"name": "}');
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Test]
+    public function indexRouteShowsMaxTwentyFiveResult(): void
+    {
+        for ($i = 1; $i < 30; ++$i) {
+            $this->createPark('Witterzomer-' . $i);
+        }
+
+        $response = $this->client->jsonRequest('GET', '/parks?page=1');
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertSelectorCount(25, 'li');
+        self::assertSame($response->filter('[data-slug="witterzomer-4"]')->text(), 'Witterzomer-4');
+        self::assertStringContainsString('25 van 29', $content);
+        self::assertStringContainsString('Page: 1 / 2', $content);
     }
 }

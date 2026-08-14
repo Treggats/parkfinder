@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <h1>Parks</h1>
+
+    <ul>
+        {% for park in items %}
+            <li data-slug="{{ park.slug }}">
+                <a href="{{ path('park_show', {slug: park.slug}) }}">{{ park.name }}</a>
+            </li>
+            {% else %}
+            <li>No parks</li>
+        {% endfor %}
+    </ul>
+
+    <p>{{ currentItemCount }} van {{ total }}</p>
+    <p>Page: {{ page }} / {{ lastPage }}</p>
+    {% if nextPage %}
+        <p><a href="{{ path('park_index', {page: nextPage}) }}">Next</a></p>
+    {% endif %}
+    {% if previousPage %}
+        <p><a href="{{ path('park_index', {page: previousPage}) }}">Previous</a></p>
+    {% endif %}
+{% endblock %}

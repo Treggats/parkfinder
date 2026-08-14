@@ -11,6 +11,7 @@ use App\Repository\ParkRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,12 +25,24 @@ final class ParkController extends AbstractController
     }
 
     #[Route('/parks', name: 'park_index', methods: ['GET'])]
-    public function index(): Response
-    {
-        $parks = $this->repository->findBy([], limit: 25);
+    public function index(
+        #[MapQueryParameter('page', FILTER_VALIDATE_INT, options: ['min_range' => 1])] int $page = 1,
+        #[MapQueryParameter('perPage', FILTER_VALIDATE_INT, options: ['min_range' => 1])] int $perPage = 25,
+    ): Response {
+        $paginator = $this->repository->paginate(
+            page: $page,
+            perPage: $perPage,
+        );
 
         return $this->render('park/index.html.twig', [
-            'parks' => $parks,
+            'page' => $paginator->page,
+            'total' => $paginator->total,
+            'perPage' => $paginator->perPage,
+            'lastPage' => $paginator->lastPage,
+            'currentItemCount' => $paginator->currentItemCount,
+            'nextPage' => $paginator->nextPage,
+            'previousPage' => $paginator->previousPage,
+            'items' => $paginator->items,
         ]);
     }
 
