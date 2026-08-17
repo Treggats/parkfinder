@@ -104,7 +104,7 @@ final class ParkControllerTest extends WebTestCase
             'hasPool' => 'ja',
         ]);
         self::assertResponseIsUnprocessable();
-        $errors = json_decode((string) $this->client->getResponse()->getContent(), flags: JSON_THROW_ON_ERROR);
+        $errors = HttpErrorResponse::make((string) $this->client->getResponse()->getContent());
 
         self::assertSame(
             'This value should be of type {{ type }}.', $errors->violations[0]->template
@@ -123,7 +123,7 @@ final class ParkControllerTest extends WebTestCase
 
         self::assertResponseIsUnprocessable();
 
-        $errors = json_decode((string) $this->client->getResponse()->getContent(), flags: JSON_THROW_ON_ERROR);
+        $errors = HttpErrorResponse::make((string) $this->client->getResponse()->getContent());
 
         self::assertSame('urn:uuid:' . UniquePark::PARK_NOT_UNIQUE_ERROR, $errors->violations[0]->type);
 
@@ -147,9 +147,9 @@ final class ParkControllerTest extends WebTestCase
 
         self::assertResponseIsUnprocessable();
 
-        $errors = json_decode((string) $this->client->getResponse()->getContent(), associative: true, flags: JSON_THROW_ON_ERROR);
+        $errors = HttpErrorResponse::make((string) $this->client->getResponse()->getContent());
 
-        $violation = array_filter($errors['violations'], fn ($x) => $x['type'] === 'urn:uuid:' . $uuid);
+        $violation = array_filter($errors->violations, fn (HttpValidationError $validationError) => $validationError->type === 'urn:uuid:' . $uuid);
         self::assertCount(1, $violation);
     }
 
@@ -162,7 +162,7 @@ final class ParkControllerTest extends WebTestCase
 
         self::assertResponseIsUnprocessable();
 
-        $errors = json_decode((string) $this->client->getResponse()->getContent(), flags: JSON_THROW_ON_ERROR);
+        $errors = HttpErrorResponse::make((string) $this->client->getResponse()->getContent());
 
         self::assertSame(
             'This value should be of type {{ type }}.', $errors->violations[0]->template
