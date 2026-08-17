@@ -19,11 +19,13 @@ final class ParkRepository extends ServiceEntityRepository
         parent::__construct($registry, Park::class);
     }
 
+    /** @return PaginatorPayload<Park[]> */
     public function paginate(int $page, int $perPage = 25): PaginatorPayload
     {
         $total = $this->count();
         $lastPage = (int) ceil($total / $perPage);
 
+        /** @var Park[] $parks */
         $parks = $this->findBy([], orderBy: ['id' => 'ASC'], limit: $perPage, offset: $perPage * ($page - 1));
 
         return new PaginatorPayload(
