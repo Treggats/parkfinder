@@ -35,14 +35,7 @@ final class ParkController extends AbstractController
         );
 
         return $this->render('park/index.html.twig', [
-            'page' => $paginator->page,
-            'total' => $paginator->total,
-            'perPage' => $paginator->perPage,
-            'lastPage' => $paginator->lastPage,
-            'currentItemCount' => $paginator->currentItemCount,
-            'nextPage' => $paginator->nextPage,
-            'previousPage' => $paginator->previousPage,
-            'items' => $paginator->items,
+            'paginator' => $paginator,
         ]);
     }
 

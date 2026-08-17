@@ -4,7 +4,7 @@
     <h1>Parks</h1>
 
     <ul>
-        {% for park in items %}
+        {% for park in paginator.items %}
             <li data-slug="{{ park.slug }}">
                 <a href="{{ path('park_show', {slug: park.slug}) }}">{{ park.name }}</a>
             </li>
@@ -13,12 +13,12 @@
         {% endfor %}
     </ul>
 
-    <p>{{ currentItemCount }} van {{ total }}</p>
-    <p>Page: {{ page }} / {{ lastPage }}</p>
-    {% if nextPage %}
-        <p><a href="{{ path('park_index', {page: nextPage}) }}">Next</a></p>
+    <p>{{ paginator.currentItemCount }} van {{ paginator.total }}</p>
+    <p>Page: {{ paginator.page }} / {{ paginator.lastPage }}</p>
+    {% if paginator.nextPage %}
+        <p><a href="{{ path('park_index', {page: paginator.nextPage}) }}">Next</a></p>
     {% endif %}
-    {% if previousPage %}
-        <p><a href="{{ path('park_index', {page: previousPage}) }}">Previous</a></p>
+    {% if paginator.previousPage %}
+        <p><a href="{{ path('park_index', {page: paginator.previousPage}) }}">Previous</a></p>
     {% endif %}
 {% endblock %}
