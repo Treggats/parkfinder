@@ -22,20 +22,13 @@ final class ParkRepository extends ServiceEntityRepository
     /** @return PaginatorPayload<Park[]> */
     public function paginate(int $page, int $perPage = 25): PaginatorPayload
     {
-        $total = $this->count();
-        $lastPage = (int) ceil($total / $perPage);
-
         /** @var Park[] $parks */
         $parks = $this->findBy([], orderBy: ['id' => 'ASC'], limit: $perPage, offset: $perPage * ($page - 1));
 
         return new PaginatorPayload(
             page: $page,
-            total: $total,
+            total: $this->count(),
             perPage: $perPage,
-            lastPage: $lastPage,
-            currentItemCount: count($parks),
-            nextPage: ($page + 1) <= $lastPage ? $page + 1 : null,
-            previousPage: ($page - 1) >= 1 ? $page - 1 : null,
             items: $parks,
         );
     }
