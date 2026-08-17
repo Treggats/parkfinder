@@ -1,1 +1,10 @@
-<h1>Park {{ park.name }}</h1>
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <h1>Park {{ park.name }}</h1>
+    {% if park.pool %}
+        <div>There is a pool available</div>
+    {% else %}
+        <div>There isn't a pool available</div>
+    {% endif %}
+{% endblock %}
