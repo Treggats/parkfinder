@@ -27,7 +27,12 @@ final class ParkController extends AbstractController
     #[Route('/parks', name: 'park_index', methods: ['GET'])]
     public function index(
         #[MapQueryParameter('page', FILTER_VALIDATE_INT, options: ['min_range' => 1])] int $page = 1,
-        #[MapQueryParameter('perPage', FILTER_VALIDATE_INT, options: ['min_range' => 1])] int $perPage = 25,
+        #[MapQueryParameter(
+            name: 'perPage',
+            filter: FILTER_VALIDATE_INT,
+            options: ['min_range' => 1, 'max_range' => 150],
+            validationFailedStatusCode: Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE
+        )] int $perPage = 25,
     ): Response {
         $paginator = $this->repository->paginate(
             page: $page,

@@ -207,4 +207,18 @@ final class ParkControllerTest extends WebTestCase
         self::assertStringContainsString('25 van 29', $content);
         self::assertStringContainsString('Page: 1 / 2', $content);
     }
+
+    #[Test]
+    public function canNotRequestTooManyResultsFromPaginator(): void
+    {
+        for ($i = 1; $i < 200; ++$i) {
+            $this->createPark('Witterzomer-' . $i);
+        }
+
+        $this->client->jsonRequest('GET', '/parks?page=1&perPage=151');
+        $errors = HttpErrorResponse::make((string) $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+
+        self::assertSame('Invalid query parameter "perPage".', $errors->detail);
+    }
 }
