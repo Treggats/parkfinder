@@ -1,0 +1,64 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  testsuite:
+
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    env:
+      APP_ENV: 'test'
+      DATABASE_URL: 'mysql://root:@127.0.0.1:3306/parkfinder?serverVersion=8.4.0&charset=utf8mb4'
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_mysql
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          bin/console importmap:install
+
+      - name: Create Database
+        run: |
+          bin/console doctrine:database:create --if-not-exists --no-interaction
+          bin/console doctrine:migrations:migrate --no-ansi --no-interaction --quiet
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --no-progress
